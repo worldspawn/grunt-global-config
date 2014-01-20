@@ -19,30 +19,19 @@ module.exports = function(grunt) {
      */
 
     var opts = this.options({
-      namespace: 'window.Config'
+      modulename: 'app.settings'
     });
 
-    this.files.forEach(function(f) {
-      var c = '';
+    if (!grunt.file.exists(this.data.files.src)){
+      grunt.log.warn('Source file "' + this.data.files.src + '" not found.');
+      return false;
+    }
 
-      f.src
-        .filter(function(p) {
-          if(grunt.file.exists(p)) {
-            return true;
-          } else {
-            grunt.log.warn('Source file "' + p + '" not found.');
-            return false;
-          }
-        })
-        .forEach(function(p) {
-          var f = grunt.file.read(p);
-          var j = JSON.parse(grunt.config.process(f));
+    var f = grunt.file.read(this.data.files.src);
+    var j = JSON.parse(grunt.config.process(f));
+    var c = JSON.stringify(j);
 
-          c += opts.namespace + ' = ' + JSON.stringify(j) + ';' + grunt.util.linefeed;
-        });
-
-      grunt.file.write(f.dest, c);
-      grunt.log.ok(f.dest);
-    });
+    grunt.file.write(this.data.files.dest, 'angular.module(\'' + opts.modulename + '\', []).value(\'settings\', ' + c + ');');
+    grunt.log.ok(this.data.files.dest);
   });
 };
