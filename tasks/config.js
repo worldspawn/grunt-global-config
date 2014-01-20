@@ -22,24 +22,16 @@ module.exports = function(grunt) {
       modulename: 'app.settings'
     });
 
-    var c = '';
-    var src = this.data.files.src.filter(function(f) {
-      if(grunt.file.exists(f)) {
-          return true;
-        } else {
-          grunt.log.warn('Source file "' + f + '" not found.');
-          return false;
-        }
-      })
-      .forEach(function(p) {
-        var f = grunt.file.read(p);
-        var j = JSON.parse(grunt.config.process(f));
+    if (!grunt.file.exists(this.data.files.src)){
+      grunt.log.warn('Source file "' + this.data.files.src + '" not found.');
+      return false;
+    }
 
-        c += JSON.stringify(j);
-      });
+    var f = grunt.file.read(this.data.files.src);
+    var j = JSON.parse(grunt.config.process(f));
+    var c = JSON.stringify(j);
 
-
-      grunt.file.write(this.data.files.dest, 'angular.module(\'' + opts.modulename + '\', []).value(\'settings\', ' + c + ');');
-      grunt.log.ok(this.data.files.dest);
+    grunt.file.write(this.data.files.dest, 'angular.module(\'' + opts.modulename + '\', []).value(\'settings\', ' + c + ');');
+    grunt.log.ok(this.data.files.dest);
   });
 };
